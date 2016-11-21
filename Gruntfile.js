@@ -1,104 +1,216 @@
-'use strict';
+"use strict";
 
 module.exports = function (grunt) {
 
   grunt.initConfig({
 
     dir: {
-      webapp: 'webapp',
-      dist: 'dist',
-      bower_components: 'bower_components'
+      webapp: "webapp",
+      tmp: "tmp",
+      dist: "dist",
+      bower_components: "bower_components" // eslint-disable-line
     },
 
     connect: {
       options: {
         port: 8080,
-        hostname: '*'
+        hostname: "*"
       },
       src: {},
       dist: {}
     },
 
-    openui5_connect: {
+    openui5_connect: { // eslint-disable-line
       options: {
         resources: [
-          '<%= dir.bower_components %>/openui5-sap.ui.core/resources',
-          '<%= dir.bower_components %>/openui5-sap.m/resources',
-          '<%= dir.bower_components %>/openui5-themelib_sap_belize/resources'
+          "<%= dir.bower_components %>/openui5-sap.ui.core/resources",
+          "<%= dir.bower_components %>/openui5-sap.m/resources",
+          "<%= dir.bower_components %>/openui5-themelib_sap_belize/resources"
         ]
       },
       src: {
         options: {
-          appresources: '<%= dir.webapp %>'
+          appresources: "<%= dir.webapp %>"
         }
       },
       dist: {
         options: {
-          appresources: '<%= dir.dist %>'
+          appresources: "<%= dir.dist %>"
         }
       }
     },
 
-    openui5_preload: {
+    openui5_preload: { // eslint-disable-line
       component: {
         options: {
           resources: {
-            cwd: '<%= dir.webapp %>',
-            prefix: 'todo'
+            cwd: "<%= dir.tmp %>",
+            prefix: "todo"
           },
-          dest: '<%= dir.dist %>'
+          dest: "<%= dir.dist %>"
         },
         components: true
       }
     },
 
     clean: {
-      dist: '<%= dir.dist %>/'
+      tmp: "<%= dir.tmp %>/",
+      dist: "<%= dir.dist %>/"
     },
 
     copy: {
+
+      // Copy files from 'webapp' to 'tmp''
+      tmp: {
+        files: [{
+          expand: true,
+          cwd: "<%= dir.webapp %>",
+          src: [
+            "**",
+            "!test/**",
+            "!**/*.js" // ~ processed with babel
+          ],
+          dest: "<%= dir.tmp %>"
+        }]
+      },
+
+      // copy files from 'tmp' to 'dist''
       dist: {
         files: [{
           expand: true,
-          cwd: '<%= dir.webapp %>',
-          src: [
-            '**',
-            '!test/**'
-          ],
-          dest: '<%= dir.dist %>'
+          cwd: "<%= dir.tmp %>",
+          src: "**",
+          dest: "<%= dir.dist %>"
         }]
       }
     },
 
     eslint: {
-      webapp: ['<%= dir.webapp %>']
+      webapp: "<%= dir.tmp %>"
+    },
+
+    babel: {
+      options: {
+        presets: ["latest"],
+      },
+      dist: {
+        files: [
+          {
+            expand: true,
+            cwd: "<%= dir.webapp %>",
+            src: ["**/*.js"],
+            dest: "<%= dir.tmp %>"
+          }
+        ]
+      }
+    },
+
+    uglify: {
+      dist: {
+        files: [
+          {
+            expand: true,
+            cwd: "<%= dir.dist %>",
+            src: ["**/*.js"],
+            dest: "<%= dir.dist %>"
+          }
+        ]
+      }
+    },
+
+    cssmin: {
+      dist: {
+        files: [
+          {
+            expand: true,
+            cwd: "<%= dir.dist %>",
+            src: ["**/*.css"],
+            dest: "<%= dir.dist %>"
+          }
+        ]
+      }
+    },
+
+    htmlmin: {
+      dist: {
+        options: {
+          removeComments: true,
+          collapseWhitespace: true,
+          minifyJS: true,
+        },
+        files: [
+          {
+            expand: true,
+            cwd: "<%= dir.dist %>",
+            src: ["**/*.html"],
+            dest: "<%= dir.dist %>"
+          }
+        ]
+      }
+    },
+
+    xmlmin: {
+      dist: {
+        options: {
+          preserveComments: false
+        },
+        files: [
+          {
+            expand: true,
+            cwd: "<%= dir.dist %>",
+            src: ["**/*.xml"],
+            dest: "<%= dir.dist %>"
+          }
+        ]
+      }
     }
 
   });
 
   // These plugins provide necessary tasks.
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-openui5');
-  grunt.loadNpmTasks('grunt-eslint');
+  grunt.loadNpmTasks("grunt-contrib-connect");
+  grunt.loadNpmTasks("grunt-contrib-clean");
+  grunt.loadNpmTasks("grunt-contrib-copy");
+  grunt.loadNpmTasks("grunt-openui5");
+  grunt.loadNpmTasks("grunt-eslint");
+
+  grunt.loadNpmTasks("grunt-babel");
+  grunt.loadNpmTasks("grunt-contrib-uglify");
+  grunt.loadNpmTasks("grunt-contrib-cssmin");
+  grunt.loadNpmTasks("grunt-contrib-htmlmin");
+  grunt.loadNpmTasks("grunt-xmlmin");
 
   // Server task
-  grunt.registerTask('serve', function (target) {
-    grunt.task.run('openui5_connect:' + (target || 'src') + ':keepalive');
+  grunt.registerTask("serve", (target) => {
+    grunt.task.run("openui5_connect:" + (target || "src") + ":keepalive");
   });
 
+  // Temporary task
+  grunt.registerTask("tmp", [
+    "copy:tmp",
+    "babel"
+  ]);
+
   // Linting task
-  grunt.registerTask('lint', ['eslint']);
+  grunt.registerTask("lint", ["eslint"]);
 
   // Build task
-  grunt.registerTask('build', ['openui5_preload', 'copy']);
+  grunt.registerTask("build", [
+    "tmp",
+    "openui5_preload",
+    "copy:dist",
+    "clean:tmp",
+    "uglify:dist",
+    "cssmin:dist",
+    "htmlmin:dist",
+    "xmlmin:dist"
+  ]);
 
   // Default task
-  grunt.registerTask('default', [
-    'lint',
-    'clean',
-    'build',
-    'serve:dist'
+  grunt.registerTask("default", [
+    //"lint",
+    "clean:dist",
+    "build",
+    "serve:dist"
   ]);
 };
