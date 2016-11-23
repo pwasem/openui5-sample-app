@@ -1,4 +1,16 @@
-node_modules
-bower_components
-dist
+# ide
 .idea
+.vscode
+
+# node
+node_modules
+
+# bower
+bower_components
+
+## build
+tmp
+dist
+
+## yarn
+yarn.lock

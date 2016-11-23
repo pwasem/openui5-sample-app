@@ -2,35 +2,51 @@
 
 sap.ui.define([
 
-  "sap/ui/core/UIComponent",
-  "sap/ui/model/json/JSONModel",
-  "sap/ui/model/resource/ResourceModel"
+    "sap/ui/core/UIComponent",
+    "sap/ui/model/json/JSONModel",
+    "sap/ui/demo/wt/controller/HelloDialog"
 
-], (UIComponent, JSONModel, ResourceModel) => UIComponent.extend("sap.ui.demo.wt.Component", {
+], (UIComponent, JSONModel, HelloDialog) => UIComponent.extend("sap.ui.demo.wt.Component", {
 
-  metadata: {
-    rootView: "sap.ui.demo.wt.view.App"
-  },
+    metadata: {
+        manifest: "json"
+    },
 
-  init: function () {
+    init: function() {
 
-    // call the init function of the parent
-    UIComponent.prototype.init.apply(this, arguments);
-    
-    // set data model
-    let oData = {
-      recipient: {
-        name: "World"
-      }
-    };
-    let oModel = new JSONModel(oData);
-    this.setModel(oModel);
+        // call the init function of the parent
+        UIComponent.prototype.init.apply(this, arguments);
 
-    // set i18n model
-    let i18nModel = new ResourceModel({
-      bundleName: "sap.ui.demo.wt.i18n.i18n"
-    });
-    this.setModel(i18nModel, "i18n");
-  }
+        // set data model
+        var oData = {
+            recipient: {
+                name: "World"
+            }
+        };
+        var oModel = new JSONModel(oData);
+        this.setModel(oModel);
+    },
+
+    getHelloDialog: function() {
+
+        // create dialog lazily
+        if (!this.helloDialog) {
+
+            // set dialog
+            this.helloDialog = new HelloDialog();
+
+        }
+
+        return this.helloDialog;
+    },
+
+    exit: function() {
+
+        if (!this.helloDialog) {
+
+            this.helloDialog.destroy();
+        }
+
+    }
 
 }));

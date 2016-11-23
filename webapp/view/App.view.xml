@@ -2,15 +2,22 @@
     controllerName="sap.ui.demo.wt.controller.App"
     xmlns="sap.m"
     xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
 >
-    <Button
-        text="{i18n>showHelloButtonText}"
-        press="onShowHello"
-    />
-    <Input
-        value="{/recipient/name}"
-        description="Hello {/recipient/name}"
-        valueLiveUpdate="true"
-        width="60%"
-    />
+    <App class="myAppDemoWT">
+        <pages>
+            <Page title="{i18n>homePageTitle}">
+            	<headerContent>
+					<Button
+						icon="sap-icon://hello-world"
+						press="onOpenDialog"
+                    />
+				</headerContent>
+                <content>
+                   <mvc:XMLView viewName="sap.ui.demo.wt.view.HelloPanel"/>
+                   <mvc:XMLView viewName="sap.ui.demo.wt.view.InvoiceList"/>     
+                </content>
+            </Page>
+        </pages>
+    </App>
 </mvc:View>
