@@ -164,6 +164,22 @@ module.exports = function (grunt) {
           }
         ]
       }
+    },
+
+    jsonmin: {
+      dist: {
+        options: {
+          stripWhitespace: true
+        },
+        files: [
+          {
+            expand: true,
+            cwd: "<%= dir.dist %>",
+            src: ["**/*.json"],
+            dest: "<%= dir.dist %>"
+          }
+        ]
+      }
     }
 
   });
@@ -180,6 +196,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-cssmin");
   grunt.loadNpmTasks("grunt-contrib-htmlmin");
   grunt.loadNpmTasks("grunt-xmlmin");
+  grunt.loadNpmTasks('grunt-jsonmin');
 
   // Server task
   grunt.registerTask("serve", (target) => {
@@ -204,7 +221,8 @@ module.exports = function (grunt) {
     "uglify:dist",
     "cssmin:dist",
     "htmlmin:dist",
-    "xmlmin:dist"
+    "xmlmin:dist",
+    "jsonmin:dist"
   ]);
 
   // Default task

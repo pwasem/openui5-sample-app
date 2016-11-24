@@ -19,5 +19,12 @@
     "grunt-eslint": "^19.0.0",
     "grunt-openui5": "^0.10.0",
     "grunt-xmlmin": "^0.1.8"
+  },
+  "dependencies": {
+    "cors": "^2.8.1",
+    "express": "^4.14.0",
+    "grunt-jsonmin": "^0.2.4",
+    "request": "^2.79.0",
+    "url-join": "^1.1.0"
   }
 }
