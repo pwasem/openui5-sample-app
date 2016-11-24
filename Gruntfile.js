@@ -23,8 +23,10 @@ module.exports = function (grunt) {
     openui5_connect: { // eslint-disable-line
       options: {
         resources: [
+          // resources
           "<%= dir.bower_components %>/openui5-sap.ui.core/resources",
           "<%= dir.bower_components %>/openui5-sap.m/resources",
+          // themes
           "<%= dir.bower_components %>/openui5-themelib_sap_bluecrystal/resources",
           "<%= dir.bower_components %>/openui5-themelib_sap_belize/resources"
         ]
